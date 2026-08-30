@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import CTASection from "../../components/CTASection.astro";
+import { processSteps } from "../../data/process";
+import { siteConfig } from "../../data/site";
+---
+
+<BaseLayout
+  title="Our Process"
+  description={`How ${siteConfig.brandName} runs a project from request to delivery.`}
+>
+  <Container class="py-16 sm:py-20">
+    <SectionHeading
+      eyebrow="How We Work"
+      title="A straightforward, five-step process"
+      subtitle="The same process applies to every project, whether it's a single listing or an ongoing batch of data-entry work."
+    />
+
+    <ol class="mx-auto mt-16 max-w-3xl space-y-8">
+      {processSteps.map((step, i) => (
+        <li class="flex gap-5">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-700 text-sm font-bold text-white">
+            {i + 1}
+          </span>
+          <div>
+            <h2 class="text-lg font-bold text-ink-900">{step.title}</h2>
+            <p class="mt-1.5 leading-relaxed text-ink-500">{step.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </Container>
+
+  <CTASection />
+</BaseLayout>

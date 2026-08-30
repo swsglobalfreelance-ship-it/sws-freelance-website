@@ -1,0 +1,107 @@
+---
+// Shared shell for every page: <head> metadata (SEO/Open Graph), Header,
+// Footer. Individual pages pass in title/description; nothing about the
+// brand or nav is hardcoded here — it comes from src/data/site.ts.
+import { siteConfig } from "../data/site";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+
+export interface Props {
+  title: string;
+  description: string;
+  /** Optional raw JSON-LD object(s) to inject as structured data. */
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description, structuredData, noindex = false } = Astro.props;
+
+const pageTitle =
+  title === siteConfig.brandName ? title : siteConfig.defaultSeo.titleTemplate.replace("%s", title);
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Organization structured data is included on every page (a sensible SEO
+// default); page-specific structuredData (Service, FAQPage, Breadcrumb...)
+// is appended alongside it.
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.brandName,
+  description: siteConfig.defaultSeo.description,
+  url: Astro.site?.toString(),
+};
+const pageSchemas = structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [];
+const jsonLdList = [organizationSchema, ...pageSchemas];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.brandName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    {jsonLdList.map((entry) => (
+      <script type="application/ld+json" set:html={JSON.stringify(entry)} />
+    ))}
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body class="flex min-h-screen flex-col bg-white antialiased">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-brand-800 focus:px-4 focus:py-2 focus:text-white"
+    >
+      Skip to main content
+    </a>
+    <Header />
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Site-wide scroll-reveal, progressive enhancement only: content is
+      // fully visible by default (see global.css) — this only adds the
+      // class that lets the CSS animate elements marked [data-reveal] into
+      // view. No dependency, no effect at all without JS or with reduced
+      // motion.
+      if (
+        "IntersectionObserver" in window &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        document.documentElement.classList.add("reveal-ready");
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-revealed");
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -10% 0px" },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+      }
+    </script>
+  </body>
+</html>

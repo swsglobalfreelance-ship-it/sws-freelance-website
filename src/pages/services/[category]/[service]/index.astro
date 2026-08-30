@@ -1,0 +1,179 @@
+---
+// Individual service page — one route generated per entry in the
+// `services` collection, nested under its category. This is the page that
+// proves the "no hardcoded service pages" requirement: adding a new
+// Fiverr gig later means adding one content file, not touching this file.
+import { getCollection } from "astro:content";
+import { render } from "astro:content";
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import Container from "../../../../components/ui/Container.astro";
+import Button from "../../../../components/ui/Button.astro";
+import Icon from "../../../../components/ui/Icon.astro";
+import Callout from "../../../../components/ui/Callout.astro";
+import FaqAccordionItem from "../../../../components/FaqAccordionItem.astro";
+import RelatedServices from "../../../../components/RelatedServices.astro";
+import CTASection from "../../../../components/CTASection.astro";
+import { processSteps } from "../../../../data/process";
+import { siteConfig } from "../../../../data/site";
+
+export async function getStaticPaths() {
+  const services = await getCollection("services");
+  const categories = await getCollection("categories");
+
+  return services.map((service) => {
+    const category = categories.find((c) => c.data.slug === service.data.category);
+    return {
+      params: { category: service.data.category, service: service.data.slug },
+      props: { service, category },
+    };
+  });
+}
+
+const { service, category } = Astro.props;
+const { Content } = await render(service);
+
+const allFaqs = await getCollection("faqs");
+const relatedFaqs = allFaqs
+  .filter((f) => f.data.relatedService === service.data.slug)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<BaseLayout
+  title={service.data.seoTitle ?? service.data.title}
+  description={service.data.seoDescription ?? service.data.shortDescription}
+  structuredData={[
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: service.data.title,
+      description: service.data.shortDescription,
+      provider: { "@type": "Organization", name: siteConfig.brandName },
+      ...(category && { category: category.data.title }),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Services", item: new URL("/services/", Astro.site).toString() },
+        ...(category
+          ? [{ "@type": "ListItem", position: 2, name: category.data.title, item: new URL(`/services/${category.data.slug}/`, Astro.site).toString() }]
+          : []),
+        { "@type": "ListItem", position: category ? 3 : 2, name: service.data.title, item: pageUrl },
+      ],
+    },
+  ]}
+>
+  <Container class="py-16 sm:py-20">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-6 flex flex-wrap items-center gap-2 text-sm text-ink-400">
+      <a href="/services/" class="hover:text-brand-700">Services</a>
+      <span>/</span>
+      {category && (
+        <>
+          <a href={`/services/${category.data.slug}/`} class="hover:text-brand-700">{category.data.title}</a>
+          <span>/</span>
+        </>
+      )}
+      <span aria-current="page" class="text-ink-600">{service.data.title}</span>
+    </nav>
+
+    <div class="grid gap-12 lg:grid-cols-3">
+      <div class="lg:col-span-2">
+        <!-- Title + short introduction -->
+        <div class="flex h-14 w-14 items-center justify-center rounded-md bg-brand-50 text-brand-700">
+          <Icon name={service.data.icon as any} class="size-7" />
+        </div>
+        <h1 class="mt-5 text-3xl font-bold text-ink-900 sm:text-4xl">{service.data.title}</h1>
+        <p class="mt-4 text-lg leading-relaxed text-ink-500">{service.data.shortDescription}</p>
+
+        {service.data.importantNote && (
+          <div class="mt-6">
+            <Callout title="Product accuracy principle">{service.data.importantNote}</Callout>
+          </div>
+        )}
+
+        <div class="prose-content mt-8 max-w-none text-ink-700 [&_p]:mb-4 [&_p]:leading-relaxed [&_strong]:text-ink-900">
+          <Content />
+        </div>
+
+        <!-- What we provide -->
+        {service.data.whatWeProvide && service.data.whatWeProvide.length > 0 && (
+          <div class="mt-12">
+            <h2 class="text-xl font-bold text-ink-900">What we provide</h2>
+            <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+              {service.data.whatWeProvide.map((item) => (
+                <li class="flex items-start gap-2.5 rounded-md border border-ink-100 p-3.5 text-sm text-ink-600">
+                  <Icon name="check-circle" class="mt-0.5 size-4 shrink-0 text-brand-600" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <!-- Our process -->
+        <div class="mt-12">
+          <h2 class="text-xl font-bold text-ink-900">Our process for this service</h2>
+          <ol class="mt-5 grid gap-4 sm:grid-cols-5">
+            {processSteps.map((step, i) => (
+              <li class="rounded-md border border-ink-100 p-4">
+                <span class="text-xs font-bold text-brand-600">{String(i + 1).padStart(2, "0")}</span>
+                <p class="mt-1.5 text-sm font-semibold text-ink-900">{step.title}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <!-- Who this is for -->
+        {service.data.whoFor && (
+          <div class="mt-12 rounded-lg border border-ink-100 bg-ink-50/60 p-6">
+            <h2 class="text-lg font-bold text-ink-900">Who this is for</h2>
+            <p class="mt-2 leading-relaxed text-ink-600">{service.data.whoFor}</p>
+          </div>
+        )}
+
+        <!-- Related FAQs -->
+        {relatedFaqs.length > 0 && (
+          <div class="mt-14">
+            <h2 class="text-xl font-bold text-ink-900">Frequently asked about this service</h2>
+            <div class="mt-4">
+              {relatedFaqs.map((faq) => <FaqAccordionItem faq={faq} />)}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <!-- Sidebar: key features + CTA -->
+      <aside class="lg:col-span-1">
+        <div class="sticky top-28 rounded-lg border border-ink-100 bg-ink-50/60 p-6">
+          {service.data.features && service.data.features.length > 0 && (
+            <>
+              <p class="text-sm font-semibold text-ink-900">Key features</p>
+              <ul class="mt-4 space-y-3">
+                {service.data.features.map((feature) => (
+                  <li class="flex items-start gap-2.5 text-sm text-ink-600">
+                    <Icon name="check" class="mt-0.5 size-4 shrink-0 text-brand-600" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <Button href={siteConfig.ctaHref} size="lg" class="mt-6 w-full">
+            {service.data.ctaLabel ?? siteConfig.ctaLabel}
+          </Button>
+        </div>
+      </aside>
+    </div>
+  </Container>
+
+  <!-- Related services (auto-derived from category — no extra data entry) -->
+  <RelatedServices currentService={service} />
+
+  <CTASection
+    title={`Ready to get started with ${service.data.title}?`}
+    subtitle="Send your project details and we'll follow up with scope and timeline."
+  />
+</BaseLayout>

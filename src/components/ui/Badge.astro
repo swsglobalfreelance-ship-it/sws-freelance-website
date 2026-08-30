@@ -1,0 +1,19 @@
+---
+// Small labeled tag. Used honestly for things like "Coming Soon" on
+// placeholder portfolio items — never to imply a claim that isn't true.
+export interface Props {
+  tone?: "brand" | "neutral" | "outline";
+  class?: string;
+}
+const { tone = "brand", class: className = "" } = Astro.props;
+
+const tones = {
+  brand: "bg-brand-50 text-brand-700",
+  neutral: "bg-ink-100 text-ink-600",
+  outline: "border border-ink-200 text-ink-600",
+};
+---
+
+<span class:list={["inline-flex items-center rounded-full px-3 py-1 text-xs font-medium", tones[tone], className]}>
+  <slot />
+</span>

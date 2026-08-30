@@ -1,0 +1,31 @@
+---
+// Auto-derived "related services" — other services in the same category,
+// excluding the current one. Zero extra data entry required: this stays
+// correct automatically as services are added or removed.
+import { getCollection, type CollectionEntry } from "astro:content";
+import Container from "./ui/Container.astro";
+import ServiceCard from "./ServiceCard.astro";
+
+interface Props {
+  currentService: CollectionEntry<"services">;
+  max?: number;
+}
+const { currentService, max = 3 } = Astro.props;
+
+const allServices = await getCollection("services");
+const related = allServices
+  .filter((s) => s.data.category === currentService.data.category && s.id !== currentService.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, max);
+---
+
+{related.length > 0 && (
+  <section class="border-t border-ink-100 bg-ink-50/60 py-16 sm:py-20">
+    <Container>
+      <h2 class="text-2xl font-bold text-ink-900">Related services</h2>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {related.map((service) => <ServiceCard service={service} />)}
+      </div>
+    </Container>
+  </section>
+)}

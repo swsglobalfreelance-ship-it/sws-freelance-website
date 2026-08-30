@@ -1,0 +1,89 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import Icon from "../../components/ui/Icon.astro";
+import CTASection from "../../components/CTASection.astro";
+import { siteConfig } from "../../data/site";
+
+const categories = (await getCollection("categories")).sort((a, b) => a.data.order - b.data.order);
+
+const principles = [
+  {
+    icon: "shield-check" as const,
+    title: "Accuracy over embellishment",
+    description:
+      "Product listings, images, and content reflect the real product and real, verifiable information — not inflated claims or invented specifications.",
+  },
+  {
+    icon: "clock" as const,
+    title: "Scope agreed before work starts",
+    description:
+      "Every project starts with a clear understanding of what's being delivered and by when, so there are no surprises partway through.",
+  },
+  {
+    icon: "users" as const,
+    title: "Direct communication",
+    description:
+      "You're working directly with the people doing the work — not routed through account managers or support tiers.",
+  },
+];
+---
+
+<!--
+  Note for the site owner: this page is written to be honest and complete
+  as-is — no invented years-in-business, team size, client count, or
+  awards. If you'd like to add a real personal introduction (who's behind
+  the business, relevant background), it can be added to the section below
+  without changing anything else on the page.
+-->
+<BaseLayout
+  title="About"
+  description={`About ${siteConfig.brandName} — focus, principles, and how we work.`}
+>
+  <Container class="max-w-3xl py-16 sm:py-20">
+    <SectionHeading
+      align="left"
+      eyebrow="About Us"
+      title={`About ${siteConfig.brandName}`}
+      subtitle="A focused freelance practice built around two service areas, done accurately and communicated clearly."
+    />
+
+    <div class="mt-10 space-y-5 leading-relaxed text-ink-600">
+      <p>
+        {siteConfig.brandName} focuses on {categories.map((c) => c.data.title.replace(" Services", "")).join(" and ")}
+        {" "}— rather than trying to cover every kind of freelance work, the service list is kept
+        deliberately focused on what can be delivered accurately and consistently.
+      </p>
+      <p>
+        We work directly from the information and files you provide. For product listings and
+        images in particular, product accuracy is treated as a firm requirement: the real
+        product — its components, specifications, and appearance — is never altered or
+        embellished to make the work look more impressive.
+      </p>
+      <p>
+        The service catalog is intentionally built to grow. As new Fiverr gigs and service
+        categories are added over time, they follow the same standard: clear scope, honest
+        representation of what's delivered, and no unsupported claims about results.
+      </p>
+    </div>
+
+    <div class="mt-16">
+      <h2 class="text-lg font-bold text-ink-900">How we approach the work</h2>
+      <div class="mt-8 grid gap-8 sm:grid-cols-3">
+        {principles.map((item) => (
+          <div>
+            <div class="flex h-11 w-11 items-center justify-center rounded-md bg-brand-50 text-brand-700">
+              <Icon name={item.icon} class="size-5" />
+            </div>
+            <h3 class="mt-4 font-bold text-ink-900">{item.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-500">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Container>
+
+  <CTASection />
+</BaseLayout>

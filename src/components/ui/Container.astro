@@ -1,0 +1,13 @@
+---
+// Consistent page-width wrapper used by every section — change max width
+// and side padding here, once, instead of repeating it across pages.
+export interface Props {
+  class?: string;
+  as?: keyof HTMLElementTagNameMap;
+}
+const { class: className = "", as: Tag = "div" } = Astro.props;
+---
+
+<Tag class:list={["mx-auto w-full max-w-page px-5 sm:px-6 lg:px-8", className]}>
+  <slot />
+</Tag>

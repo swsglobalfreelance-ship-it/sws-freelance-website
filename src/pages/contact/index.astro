@@ -1,0 +1,114 @@
+---
+// NOTE (Milestone 2): This form is not yet wired to a backend. The plan is
+// a Cloudflare Pages Function + Turnstile (see README) to relay
+// submissions by email with no server to maintain. For now, submitting
+// shows an honest inline message instead of silently failing or pretending
+// to send data that isn't actually going anywhere.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import Icon from "../../components/ui/Icon.astro";
+import { siteConfig } from "../../data/site";
+
+const categories = (await getCollection("categories")).sort((a, b) => a.data.order - b.data.order);
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Contact / Get a Quote"
+  description={`Send project details to ${siteConfig.brandName} and get a response with scope and timeline.`}
+>
+  <Container class="max-w-3xl py-16 sm:py-20">
+    <SectionHeading
+      align="left"
+      eyebrow="Get In Touch"
+      title="Contact / Get a Quote"
+      subtitle="Tell us about your project — we'll follow up with scope and timeline before anything starts."
+    />
+
+    <form id="contact-form" class="mt-12 space-y-6" novalidate>
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label for="name" class="block text-sm font-semibold text-ink-800">Name<span class="text-accent-600">*</span></label>
+          <input
+            id="name" name="name" type="text" required autocomplete="name"
+            class="mt-2 w-full rounded-md border border-ink-200 px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus-visible:border-brand-500"
+            placeholder="Your name"
+          />
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-semibold text-ink-800">Email<span class="text-accent-600">*</span></label>
+          <input
+            id="email" name="email" type="email" required autocomplete="email"
+            class="mt-2 w-full rounded-md border border-ink-200 px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus-visible:border-brand-500"
+            placeholder="you@example.com"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="service" class="block text-sm font-semibold text-ink-800">Service<span class="text-accent-600">*</span></label>
+        <select
+          id="service" name="service" required
+          class="mt-2 w-full rounded-md border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900 focus-visible:border-brand-500"
+        >
+          <option value="" selected disabled>Select a service</option>
+          {categories.map((category) => (
+            <optgroup label={category.data.title}>
+              {services
+                .filter((s) => s.data.category === category.data.slug)
+                .map((service) => <option value={service.data.title}>{service.data.title}</option>)}
+            </optgroup>
+          ))}
+          <option value="Other">Other / Not Sure</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="details" class="block text-sm font-semibold text-ink-800">Project Details<span class="text-accent-600">*</span></label>
+        <textarea
+          id="details" name="details" required rows="5"
+          class="mt-2 w-full rounded-md border border-ink-200 px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus-visible:border-brand-500"
+          placeholder="What do you need done? Include links or file names if relevant — you can send the actual files after we reply."
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="budget" class="block text-sm font-semibold text-ink-800">Budget <span class="font-normal text-ink-400">(optional)</span></label>
+        <input
+          id="budget" name="budget" type="text"
+          class="mt-2 w-full rounded-md border border-ink-200 px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus-visible:border-brand-500"
+          placeholder="e.g. $50–100, or leave blank"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="inline-flex items-center justify-center gap-2 rounded-md bg-brand-700 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
+      >
+        Send Message
+        <Icon name="arrow-right" class="size-4" />
+      </button>
+
+      <p id="contact-form-status" class="hidden rounded-md border border-brand-200 bg-brand-50 p-4 text-sm text-brand-800" role="status"></p>
+    </form>
+  </Container>
+</BaseLayout>
+
+<script define:vars={{ contactEmail: siteConfig.contactEmail }}>
+  const form = document.getElementById("contact-form");
+  const status = document.getElementById("contact-form-status");
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!(form instanceof HTMLFormElement) || !form.reportValidity()) return;
+
+    if (status) {
+      status.textContent =
+        `This form isn't connected to a live inbox yet (that's a Milestone 2 item). ` +
+        `In the meantime, please email your details directly to ${contactEmail}.`;
+      status.classList.remove("hidden");
+    }
+  });
+</script>

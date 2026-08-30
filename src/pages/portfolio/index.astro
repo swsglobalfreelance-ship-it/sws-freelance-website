@@ -1,0 +1,56 @@
+---
+// Fully data-driven — grouped by the `portfolioCategories` collection, with
+// items pulled from the `portfolio` collection. Add a new portfolio
+// category or item as a content file and it appears here automatically.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import PortfolioCard from "../../components/PortfolioCard.astro";
+import CTASection from "../../components/CTASection.astro";
+import { siteConfig } from "../../data/site";
+
+const portfolioCategories = (await getCollection("portfolioCategories")).sort((a, b) => a.data.order - b.data.order);
+const allItems = (await getCollection("portfolio")).sort((a, b) => a.data.order - b.data.order);
+const hasRealSamples = allItems.some((item) => !item.data.isPlaceholder);
+---
+
+<BaseLayout
+  title="Portfolio"
+  description={`Project samples from ${siteConfig.brandName}, organized by category.`}
+>
+  <Container class="py-16 sm:py-20">
+    <SectionHeading
+      eyebrow="Portfolio"
+      title="Project samples"
+      subtitle={
+        hasRealSamples
+          ? "A selection of completed project work, organized by category."
+          : "This portfolio is being built out with real, completed project samples. Nothing shown below represents finished client work yet — it's marked honestly as placeholder until it does."
+      }
+    />
+
+    <div class="mt-16 space-y-16">
+      {portfolioCategories.map((category) => {
+        const items = allItems.filter((item) => item.data.portfolioCategory === category.data.slug);
+        if (items.length === 0) return null;
+        return (
+          <div>
+            <div class="border-b border-ink-100 pb-4">
+              <h2 class="text-xl font-bold text-ink-900">{category.data.title}</h2>
+              {category.data.description && <p class="mt-1 text-sm text-ink-500">{category.data.description}</p>}
+            </div>
+            <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {items.map((item) => <PortfolioCard item={item} />)}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </Container>
+
+  <CTASection
+    title="Have a project you'd like featured here next?"
+    subtitle="Real, completed work replaces these placeholders as it's finished — yours could be next."
+  />
+</BaseLayout>

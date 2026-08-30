@@ -1,0 +1,38 @@
+---
+// Fully data-driven — every entry in the `faqs` collection is listed here.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import FaqAccordionItem from "../../components/FaqAccordionItem.astro";
+import CTASection from "../../components/CTASection.astro";
+import { siteConfig } from "../../data/site";
+
+const faqs = (await getCollection("faqs")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="FAQ"
+  description={`Frequently asked questions about working with ${siteConfig.brandName}.`}
+  structuredData={{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.data.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.body?.trim() ?? "",
+      },
+    })),
+  }}
+>
+  <Container class="max-w-3xl py-16 sm:py-20">
+    <SectionHeading eyebrow="FAQ" title="Frequently asked questions" />
+    <div class="mt-12">
+      {faqs.map((faq) => <FaqAccordionItem faq={faq} />)}
+    </div>
+  </Container>
+
+  <CTASection />
+</BaseLayout>

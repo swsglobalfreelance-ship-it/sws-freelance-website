@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import { siteConfig } from "../../data/site";
+
+const lastUpdated = "Draft — not yet published";
+---
+
+<BaseLayout title="Privacy Policy" description={`Privacy policy for ${siteConfig.brandName}.`}>
+  <Container class="max-w-3xl py-16 sm:py-20">
+    <h1 class="text-3xl font-bold text-ink-900">Privacy Policy</h1>
+    <p class="mt-2 text-sm text-ink-400">{lastUpdated}</p>
+
+    <p class="mt-6 rounded-lg border border-dashed border-ink-300 bg-ink-50 p-5 text-sm leading-relaxed text-ink-600">
+      <strong class="text-ink-800">Starter template — review before launch.</strong>
+      The text below is a plain-language starting point based on what this site
+      actually does today (a contact form; no checkout, no accounts, no
+      third-party ad trackers). It is not legal advice. Have it reviewed —
+      ideally by a legal professional — before the site goes live with real
+      traffic, and update it if that changes (e.g. if analytics, cookies, or
+      payment processing are added later).
+    </p>
+
+    <div class="mt-10 space-y-8 leading-relaxed text-ink-600">
+      <section>
+        <h2 class="text-lg font-bold text-ink-900">Information we collect</h2>
+        <p class="mt-2">
+          When you submit the contact form, we collect the information you
+          provide: your name, email address, selected service, project
+          details, and an optional budget. We don't collect payment
+          information, government ID numbers, or other sensitive personal
+          data through this site.
+        </p>
+      </section>
+      <section>
+        <h2 class="text-lg font-bold text-ink-900">How we use it</h2>
+        <p class="mt-2">
+          Information submitted through the contact form is used only to
+          respond to your inquiry and, if you proceed, to deliver the
+          requested service. We do not sell or share it with third parties
+          for marketing purposes.
+        </p>
+      </section>
+      <section>
+        <h2 class="text-lg font-bold text-ink-900">Cookies and analytics</h2>
+        <p class="mt-2">
+          This site does not currently use tracking cookies or third-party
+          advertising trackers. If privacy-respecting analytics are added
+          later, this section will be updated to describe exactly what's
+          collected.
+        </p>
+      </section>
+      <section>
+        <h2 class="text-lg font-bold text-ink-900">Contact</h2>
+        <p class="mt-2">
+          Questions about this policy can be sent to {siteConfig.contactEmail}.
+        </p>
+      </section>
+    </div>
+  </Container>
+</BaseLayout>

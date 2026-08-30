@@ -1,0 +1,234 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/ui/Container.astro";
+import Button from "../components/ui/Button.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import Icon from "../components/ui/Icon.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import ServiceCard from "../components/ServiceCard.astro";
+import PortfolioCard from "../components/PortfolioCard.astro";
+import FaqAccordionItem from "../components/FaqAccordionItem.astro";
+import CTASection from "../components/CTASection.astro";
+import { siteConfig } from "../data/site";
+import { processSteps } from "../data/process";
+
+const categories = (await getCollection("categories")).sort((a, b) => a.data.order - b.data.order);
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
+
+// Each category gets its own dedicated showcase section below, in category
+// order — add a category content file and it gets a full section here
+// automatically, no code change required. Background shading alternates
+// with the surrounding static sections; the offsets keep that alternation
+// correct no matter how many categories exist.
+const catCount = categories.length;
+const isShaded = (globalIndex: number) => globalIndex % 2 === 1;
+const whyChooseShaded = isShaded(1 + catCount);
+const howWeWorkShaded = isShaded(2 + catCount);
+const portfolioShaded = isShaded(3 + catCount);
+const faqShaded = isShaded(4 + catCount);
+
+const portfolioItems = (await getCollection("portfolio")).sort((a, b) => a.data.order - b.data.order).slice(0, 4);
+const featuredFaqs = (await getCollection("faqs"))
+  .filter((f) => f.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+
+const trustPoints = [
+  { icon: "shield-check" as const, label: "Accuracy-first work" },
+  { icon: "clock" as const, label: "Scope & timeline confirmed upfront" },
+  { icon: "mail" as const, label: "Direct communication" },
+  { icon: "check-circle" as const, label: "Revisions where agreed" },
+];
+
+const whyChooseUs = [
+  {
+    icon: "shield-check" as const,
+    title: "Accuracy first",
+    description: "No invented product details, no fabricated claims — what we deliver reflects the real information you give us.",
+  },
+  {
+    icon: "clock" as const,
+    title: "Clear timelines",
+    description: "Scope and turnaround are confirmed before work starts, so there are no surprises partway through.",
+  },
+  {
+    icon: "users" as const,
+    title: "Direct communication",
+    description: "You're working directly with the people doing the work, not routed through layers of account management.",
+  },
+];
+---
+
+<BaseLayout
+  title={siteConfig.brandName}
+  description={siteConfig.description}
+>
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-ink-950">
+    <div class="absolute inset-0 bg-radial-[at_top_right] from-brand-800/40 via-ink-950 to-ink-950"></div>
+    <Container class="relative py-24 sm:py-32">
+      <div class="max-w-2xl">
+        <p class="hero-in text-sm font-semibold uppercase tracking-wide text-brand-300">{siteConfig.tagline}</p>
+        <h1 class="hero-in-delay-1 mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl">
+          Amazon &amp; e-commerce support, done accurately and on schedule.
+        </h1>
+        <p class="hero-in-delay-1 mt-6 text-lg leading-relaxed text-ink-300">
+          {siteConfig.description}
+        </p>
+        <div class="hero-in-delay-2 mt-9 flex flex-wrap gap-4">
+          <Button href={siteConfig.ctaHref} size="lg">
+            Get a Quote
+            <Icon name="arrow-right" class="size-4" />
+          </Button>
+          <Button href="/services/" size="lg" variant="secondary" class="border-white/20 bg-transparent text-white hover:bg-white/10">
+            View Services
+          </Button>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Trust strip -->
+  <section class="border-b border-ink-100 bg-white py-8">
+    <Container>
+      <ul class="grid grid-cols-2 gap-6 sm:grid-cols-4">
+        {trustPoints.map((point) => (
+          <li class="flex items-center gap-2.5 text-sm font-medium text-ink-600">
+            <Icon name={point.icon} class="size-5 shrink-0 text-brand-600" />
+            {point.label}
+          </li>
+        ))}
+      </ul>
+    </Container>
+  </section>
+
+  <!-- Services overview -->
+  <section class="py-20 sm:py-24">
+    <Container>
+      <SectionHeading
+        eyebrow="What We Do"
+        title="Two service categories, built to grow"
+        subtitle="We currently focus on Amazon e-commerce support and data entry / virtual assistant work — with more services added over time as the catalog grows."
+      />
+      <div class="mt-14 grid gap-6 sm:grid-cols-2">
+        {categories.map((category) => {
+          const count = services.filter((s) => s.data.category === category.data.slug).length;
+          return <CategoryCard category={category} serviceCount={count} />;
+        })}
+      </div>
+    </Container>
+  </section>
+
+  <!-- Per-category showcase — one section per entry in the categories
+       collection, in order. Adding a new category (a new content file) adds
+       its full showcase section here automatically; nothing in this file
+       needs to change. -->
+  {categories.map((category, i) => {
+    const categoryServices = services.filter((s) => s.data.category === category.data.slug);
+    if (categoryServices.length === 0) return null;
+    return (
+      <section class:list={["py-20 sm:py-24", i % 2 === 0 && "bg-ink-50/60"]}>
+        <Container>
+          <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+            <SectionHeading
+              align="left"
+              eyebrow={category.data.title}
+              title={category.data.title}
+              subtitle={category.data.description}
+            />
+            <a href={`/services/${category.data.slug}/`} class="hidden shrink-0 items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800 sm:inline-flex">
+              View category
+              <Icon name="arrow-right" class="size-4" />
+            </a>
+          </div>
+          <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {categoryServices.map((service) => <ServiceCard service={service} />)}
+          </div>
+        </Container>
+      </section>
+    );
+  })}
+
+  <!-- Why choose us -->
+  <section class:list={["py-20 sm:py-24", whyChooseShaded && "bg-ink-50/60"]}>
+    <Container>
+      <SectionHeading eyebrow="Why Choose Us" title="What working with us looks like" />
+      <div class="mt-14 grid gap-8 sm:grid-cols-3">
+        {whyChooseUs.map((item) => (
+          <div class="text-center sm:text-left">
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-brand-700 text-white sm:mx-0">
+              <Icon name={item.icon} class="size-6" />
+            </div>
+            <h3 class="mt-5 text-lg font-bold text-ink-900">{item.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-500">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </section>
+
+  <!-- How we work -->
+  <section class:list={["py-20 sm:py-24", howWeWorkShaded && "bg-ink-50/60"]}>
+    <Container>
+      <SectionHeading
+        eyebrow="How We Work"
+        title="A straightforward, five-step process"
+        subtitle="The same process applies whether it's a single listing or an ongoing batch of data-entry work."
+      />
+      <ol class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        {processSteps.map((step, i) => (
+          <li class="rounded-lg border border-ink-100 p-5">
+            <span class="text-sm font-bold text-brand-600">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="mt-2 font-bold text-ink-900">{step.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-500">{step.description}</p>
+          </li>
+        ))}
+      </ol>
+      <div class="mt-8 text-center">
+        <a href="/process/" class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+          More on our process
+          <Icon name="arrow-right" class="size-4" />
+        </a>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Portfolio preview -->
+  <section class:list={["py-20 sm:py-24", portfolioShaded && "bg-ink-50/60"]}>
+    <Container>
+      <SectionHeading
+        eyebrow="Portfolio"
+        title="Recent work"
+        subtitle="This section is being built out with real, completed project samples — shown honestly as placeholders until then."
+      />
+      <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {portfolioItems.map((item) => <PortfolioCard item={item} />)}
+      </div>
+      <div class="mt-8 text-center">
+        <a href="/portfolio/" class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+          View portfolio
+          <Icon name="arrow-right" class="size-4" />
+        </a>
+      </div>
+    </Container>
+  </section>
+
+  <!-- FAQ preview -->
+  <section class:list={["py-20 sm:py-24", faqShaded && "bg-ink-50/60"]}>
+    <Container class="max-w-3xl">
+      <SectionHeading eyebrow="FAQ" title="Common questions" />
+      <div class="mt-10">
+        {featuredFaqs.map((faq) => <FaqAccordionItem faq={faq} />)}
+      </div>
+      <div class="mt-8 text-center">
+        <a href="/faq/" class="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800">
+          View all FAQs
+          <Icon name="arrow-right" class="size-4" />
+        </a>
+      </div>
+    </Container>
+  </section>
+
+  <CTASection />
+</BaseLayout>

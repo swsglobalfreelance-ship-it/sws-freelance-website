@@ -1,0 +1,24 @@
+---
+import { siteConfig } from "../data/site";
+import Container from "./ui/Container.astro";
+import Button from "./ui/Button.astro";
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+}
+const {
+  title = "Have a project in mind?",
+  subtitle = "Tell us what you need — we'll follow up with clear next steps and a timeline.",
+} = Astro.props;
+---
+
+<section class="bg-brand-900">
+  <Container data-reveal class="flex flex-col items-center gap-6 py-16 text-center sm:py-20">
+    <h2 class="max-w-xl text-3xl font-bold text-white sm:text-4xl">{title}</h2>
+    <p class="max-w-lg text-base text-brand-100/80">{subtitle}</p>
+    <Button href={siteConfig.ctaHref} size="lg" class="bg-white text-brand-900 hover:bg-brand-50">
+      {siteConfig.ctaLabel}
+    </Button>
+  </Container>
+</section>

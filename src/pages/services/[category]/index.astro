@@ -1,0 +1,77 @@
+---
+// Category page — one route generated per entry in the `categories`
+// collection. Adding a new category (with matching services) creates a new
+// page here automatically; nothing in this file needs to change.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Container from "../../../components/ui/Container.astro";
+import SectionHeading from "../../../components/ui/SectionHeading.astro";
+import ServiceCard from "../../../components/ServiceCard.astro";
+import CTASection from "../../../components/CTASection.astro";
+import Icon from "../../../components/ui/Icon.astro";
+
+export async function getStaticPaths() {
+  const categories = await getCollection("categories");
+  return categories.map((category) => ({
+    params: { category: category.data.slug },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+const allServices = await getCollection("services");
+const services = allServices
+  .filter((s) => s.data.category === category.data.slug)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const pageUrl = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<BaseLayout
+  title={category.data.seoTitle ?? category.data.title}
+  description={category.data.seoDescription ?? category.data.description}
+  structuredData={[
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      serviceType: category.data.title,
+      description: category.data.description,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Services", item: new URL("/services/", Astro.site).toString() },
+        { "@type": "ListItem", position: 2, name: category.data.title, item: pageUrl },
+      ],
+    },
+  ]}
+>
+  <Container class="py-16 sm:py-20">
+    <nav aria-label="Breadcrumb" class="mb-6 text-sm text-ink-400">
+      <a href="/services/" class="hover:text-brand-700">Services</a>
+      <span class="mx-2">/</span>
+      <span class="text-ink-600">{category.data.title}</span>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <div class="flex h-14 w-14 items-center justify-center rounded-md bg-brand-50 text-brand-700">
+        <Icon name={category.data.icon as any} class="size-7" />
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold text-ink-900 sm:text-4xl">{category.data.title}</h1>
+      </div>
+    </div>
+    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-500">{category.data.description}</p>
+
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {services.map((service) => <ServiceCard service={service} />)}
+    </div>
+
+    {services.length === 0 && (
+      <p class="mt-8 text-ink-400">Services for this category will be added soon.</p>
+    )}
+  </Container>
+
+  <CTASection />
+</BaseLayout>

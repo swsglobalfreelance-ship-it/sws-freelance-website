@@ -1,0 +1,31 @@
+---
+// Reusable highlighted note box — used for service-specific hard rules
+// (e.g. the product-image accuracy principle) and anywhere else a page
+// needs to visually flag an important, non-negotiable point.
+import Icon from "./Icon.astro";
+
+export interface Props {
+  tone?: "brand" | "warning";
+  title?: string;
+}
+const { tone = "brand", title = "Important" } = Astro.props;
+
+const tones = {
+  brand: "border-brand-200 bg-brand-50 text-brand-900",
+  warning: "border-accent-400/40 bg-accent-500/10 text-ink-900",
+};
+const iconTones = {
+  brand: "text-brand-700",
+  warning: "text-accent-600",
+};
+---
+
+<div class:list={["flex gap-3 rounded-lg border p-5", tones[tone]]}>
+  <Icon name="shield-check" class:list={["mt-0.5 size-5 shrink-0", iconTones[tone]]} />
+  <div>
+    <p class="text-sm font-bold">{title}</p>
+    <div class="mt-1.5 text-sm leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0">
+      <slot />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+---
+// Centralized button styles. Every CTA on the site should use this
+// component instead of a hand-styled <a>/<button> so the look stays
+// consistent as more pages/services are added.
+export interface Props {
+  href?: string;
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "md" | "lg";
+  class?: string;
+  type?: "button" | "submit" | "reset";
+}
+
+const {
+  href,
+  variant = "primary",
+  size = "md",
+  class: className = "",
+  type = "button",
+} = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-[color,background-color,border-color,transform] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:opacity-50 disabled:pointer-events-none";
+
+const variants = {
+  primary: "bg-brand-700 text-white hover:bg-brand-800",
+  secondary: "bg-white text-brand-800 border border-ink-200 hover:border-brand-400 hover:bg-brand-50",
+  ghost: "text-brand-700 hover:bg-brand-50",
+};
+
+const sizes = {
+  md: "px-5 py-2.5 text-sm",
+  lg: "px-6 py-3.5 text-base",
+};
+
+const classes = [base, variants[variant], sizes[size], className].join(" ");
+const Tag = href ? "a" : "button";
+---
+
+<Tag class={classes} href={href} type={href ? undefined : type}>
+  <slot />
+</Tag>

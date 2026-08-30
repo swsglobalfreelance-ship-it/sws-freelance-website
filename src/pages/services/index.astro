@@ -1,0 +1,44 @@
+---
+// All-services overview. Entirely generated from the categories + services
+// collections — add a category or service and it appears here automatically.
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import CategoryCard from "../../components/CategoryCard.astro";
+import ServiceCard from "../../components/ServiceCard.astro";
+import CTASection from "../../components/CTASection.astro";
+import { siteConfig } from "../../data/site";
+
+const categories = (await getCollection("categories")).sort((a, b) => a.data.order - b.data.order);
+const services = (await getCollection("services")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Services"
+  description={`Explore all ${siteConfig.brandName} services, organized by category.`}
+>
+  <Container class="py-16 sm:py-20">
+    <SectionHeading
+      eyebrow="What We Do"
+      title="Services"
+      subtitle="Organized by category — browse a category for details on each individual service."
+    />
+
+    <div class="mt-14 grid gap-6 sm:grid-cols-2">
+      {categories.map((category) => {
+        const count = services.filter((s) => s.data.category === category.data.slug).length;
+        return <CategoryCard category={category} serviceCount={count} />;
+      })}
+    </div>
+
+    <div class="mt-20">
+      <h2 class="text-2xl font-bold text-ink-900">All individual services</h2>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {services.map((service) => <ServiceCard service={service} />)}
+      </div>
+    </div>
+  </Container>
+
+  <CTASection />
+</BaseLayout>
