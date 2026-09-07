@@ -68,22 +68,67 @@ const whyChooseUs = [
   <section class="relative overflow-hidden bg-ink-950">
     <div class="absolute inset-0 bg-radial-[at_top_right] from-brand-800/40 via-ink-950 to-ink-950"></div>
     <Container class="relative py-24 sm:py-32">
-      <div class="max-w-2xl">
-        <p class="hero-in text-sm font-semibold uppercase tracking-wide text-brand-300">{siteConfig.tagline}</p>
-        <h1 class="hero-in-delay-1 mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl">
-          Amazon &amp; e-commerce support, done accurately and on schedule.
-        </h1>
-        <p class="hero-in-delay-1 mt-6 text-lg leading-relaxed text-ink-300">
-          {siteConfig.description}
-        </p>
-        <div class="hero-in-delay-2 mt-9 flex flex-wrap gap-4">
-          <Button href={siteConfig.ctaHref} size="lg">
-            Get a Quote
-            <Icon name="arrow-right" class="size-4" />
-          </Button>
-          <Button href="/services/" size="lg" variant="secondary" class="border-white/20 bg-transparent text-white hover:bg-white/10">
-            View Services
-          </Button>
+      <div class="flex flex-col lg:flex-row lg:items-center lg:gap-12 xl:gap-20">
+        <div class="max-w-2xl">
+          <p class="hero-in text-sm font-semibold uppercase tracking-wide text-brand-300">{siteConfig.tagline}</p>
+          <h1 class="hero-in-delay-1 mt-4 text-4xl font-bold leading-tight text-white sm:text-5xl">
+            Amazon &amp; e-commerce support, done accurately and on schedule.
+          </h1>
+          <p class="hero-in-delay-1 mt-6 text-lg leading-relaxed text-ink-300">
+            {siteConfig.description}
+          </p>
+          <div class="hero-in-delay-2 mt-9 flex flex-wrap gap-4">
+            <Button href={siteConfig.ctaHref} size="lg">
+              Get a Quote
+              <Icon name="arrow-right" class="size-4" />
+            </Button>
+            <Button href="/services/" size="lg" variant="outline-inverse">
+              View Services
+            </Button>
+          </div>
+        </div>
+
+        <!-- Decorative, purely illustrative wireframe graphic — generic
+             "listing" / "data sheet" shapes built from skeleton bars and the
+             existing icon set. Not a screenshot or mockup of any real
+             product, client, or dashboard; no numbers or claims. Hidden
+             below lg so it never competes with the text on small screens. -->
+        <div class="relative mt-16 hidden shrink-0 lg:mt-0 lg:block" aria-hidden="true">
+          <div class="relative h-72 w-72 xl:h-80 xl:w-80">
+            <div class="absolute inset-8 -z-10 rounded-full bg-brand-600/20 blur-3xl"></div>
+
+            <div class="absolute -right-2 top-2 w-56 -rotate-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 shadow-soft-lg backdrop-blur-sm">
+              <div class="flex items-center gap-2.5">
+                <div class="flex h-8 w-8 items-center justify-center rounded-md bg-accent-500/20 text-accent-400">
+                  <Icon name="table" class="size-4" />
+                </div>
+                <div class="h-2 w-20 rounded-full bg-white/15"></div>
+              </div>
+              <div class="mt-4 space-y-2.5">
+                <div class="h-2 rounded-full bg-white/10"></div>
+                <div class="h-2 w-5/6 rounded-full bg-white/10"></div>
+                <div class="h-2 w-3/5 rounded-full bg-white/10"></div>
+              </div>
+            </div>
+
+            <div class="absolute left-0 top-28 w-56 rotate-2 rounded-xl border border-white/10 bg-white/[0.06] p-5 shadow-soft-lg backdrop-blur-sm">
+              <div class="flex items-start gap-3">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-brand-700/40 text-brand-200">
+                  <Icon name="image" class="size-6" />
+                </div>
+                <div class="flex-1 space-y-2.5 pt-1">
+                  <div class="h-2.5 w-full rounded-full bg-white/20"></div>
+                  <div class="h-2.5 w-3/4 rounded-full bg-white/15"></div>
+                  <div class="h-2.5 w-1/2 rounded-full bg-white/10"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="absolute -bottom-3 right-8 flex items-center gap-1.5 rounded-full border border-white/10 bg-ink-900/90 px-3 py-1.5 shadow-soft backdrop-blur-sm">
+              <Icon name="shopping-cart" class="size-3.5 text-accent-400" />
+              <span class="text-[11px] font-semibold text-white/70">E-commerce &amp; Data</span>
+            </div>
+          </div>
         </div>
       </div>
     </Container>

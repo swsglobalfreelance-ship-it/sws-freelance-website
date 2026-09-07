@@ -4,7 +4,7 @@
 // consistent as more pages/services are added.
 export interface Props {
   href?: string;
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "inverse" | "outline-inverse";
   size?: "md" | "lg";
   class?: string;
   type?: "button" | "submit" | "reset";
@@ -21,10 +21,30 @@ const {
 const base =
   "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-[color,background-color,border-color,transform] duration-150 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:opacity-50 disabled:pointer-events-none";
 
+// Each variant carries a stable "btn-*" hook class (defined in global.css
+// under @layer components) IN ADDITION to the Tailwind utility classes.
+// The utilities are the source of truth visually; the btn-* rule sets the
+// same background/text color directly from the design-token custom
+// properties, so the button can never render with invisible/low-contrast
+// text in its default state even if a utility class fails to generate for
+// any reason — visibility never depends on :hover.
+//
+// "inverse" / "outline-inverse" exist specifically for CTAs placed on a
+// dark/brand-colored background (e.g. CTASection, the hero). Earlier this
+// was done by handing primary/secondary an extra `class` prop that
+// overrode their background/text utilities — but that pits two utility
+// classes with equal specificity against each other, and which one wins is
+// decided by the order Tailwind happens to generate them in, not by their
+// order in the class list. That ambiguity was the real, root-cause source
+// of CTAs intermittently losing contrast. Giving dark-background CTAs their
+// own first-class variant removes the collision entirely instead of
+// forcing a winner with `!important`.
 const variants = {
-  primary: "bg-brand-700 text-white hover:bg-brand-800",
-  secondary: "bg-white text-brand-800 border border-ink-200 hover:border-brand-400 hover:bg-brand-50",
-  ghost: "text-brand-700 hover:bg-brand-50",
+  primary: "btn-primary bg-brand-700 text-white hover:bg-brand-800",
+  secondary: "btn-secondary bg-white text-brand-800 border border-ink-200 hover:border-brand-400 hover:bg-brand-50",
+  ghost: "btn-ghost text-brand-700 hover:bg-brand-50",
+  inverse: "btn-inverse bg-white text-brand-900 hover:bg-brand-50",
+  "outline-inverse": "btn-outline-inverse border border-white/20 bg-transparent text-white hover:bg-white/10",
 };
 
 const sizes = {

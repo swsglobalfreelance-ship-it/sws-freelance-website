@@ -12,12 +12,19 @@ const { title, summary, isPlaceholder } = item.data;
 ---
 
 <Card class="h-full">
-  <div class="flex aspect-video items-center justify-center rounded-md bg-ink-50 text-ink-300">
-    <Icon name="image" class="size-10" />
-  </div>
+  {isPlaceholder ? (
+    <div class="flex aspect-video flex-col items-center justify-center gap-2 rounded-md border border-dashed border-ink-200 bg-ink-50/60 text-ink-300">
+      <Icon name="image" class="size-8" />
+      <span class="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Sample coming soon</span>
+    </div>
+  ) : (
+    <div class="flex aspect-video items-center justify-center rounded-md bg-ink-50 text-ink-300">
+      <Icon name="image" class="size-10" />
+    </div>
+  )}
   <div class="mt-4 flex items-start justify-between gap-3">
     <h3 class="font-bold text-ink-900">{title}</h3>
-    {isPlaceholder && <Badge tone="neutral">Coming Soon</Badge>}
+    {isPlaceholder && <Badge tone="brand">Coming Soon</Badge>}
   </div>
   <p class="mt-2 text-sm leading-relaxed text-ink-500">{summary}</p>
 </Card>

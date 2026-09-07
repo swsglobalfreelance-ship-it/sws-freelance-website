@@ -13,10 +13,9 @@
 
 // Plain string constant (no other imports) so astro.config.mjs can safely
 // import it at config-load time, before the rest of Astro is available.
-// PLACEHOLDER — update once Cloudflare Pages assigns the real *.pages.dev
-// URL, and again once the final domain is connected. Nothing needs to
-// change anywhere else when this value changes.
-export const SITE_URL = "https://sws-freelance.pages.dev";
+// Set to the live Cloudflare Workers/Pages URL. Update again once a final
+// custom domain is connected — nothing else needs to change when it does.
+export const SITE_URL = "https://sws-freelance-website.swsglobal-freelance.workers.dev";
 
 export const siteConfig = {
   brandName: "SWS Freelance",
